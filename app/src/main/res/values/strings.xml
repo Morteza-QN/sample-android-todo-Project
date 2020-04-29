@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">To-Do Project</string>
+    <string name="hint_search">جستجو</string>
+    <string name="title_dialog_task">اضافه کردن وظیفه</string>
+    <string name="hint_et_dialog">عنوان</string>
+    <string name="save">ذخیره</string>
 </resources>
