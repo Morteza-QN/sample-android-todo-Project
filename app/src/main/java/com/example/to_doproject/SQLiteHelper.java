@@ -83,7 +83,31 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
 
     // TODO: 4/29/2020 searchInTasks
-    public void searchInTasks(String query) {}
+    public List<Task> searchInTasks(String query) {
+        SQLiteDatabase database = getReadableDatabase();
+        List<Task>     tasks    = new ArrayList<>();
+        Cursor         cursor   =
+                database.rawQuery("SELECT * FROM " + TABLE_TASK + " WHERE " + TITLE_TASK + " LIKE '%" + query + "%' ", null);
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    Task task = new Task();
+                    task.setId(cursor.getLong(0));
+                    task.setTitle(cursor.getString(1));
+                    task.setCompleted(cursor.getInt(2) == 1);
+                    tasks.add(task);
+                }
+                while (cursor.moveToNext());
+            }
+            Log.i(TAG, "search task on database = " + tasks.size());
+            cursor.close();
+            database.close();
+        }
+        catch (Exception e) {
+            Log.i(TAG, "search: " + e.toString());
+        }
+        return tasks;
+    }
 
 
     public int updateTask(Task task) {
@@ -106,7 +130,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    // TODO: 5/2/2020 deleteAll
     public void clearAllTasks() {
         SQLiteDatabase database = getWritableDatabase();
         try {

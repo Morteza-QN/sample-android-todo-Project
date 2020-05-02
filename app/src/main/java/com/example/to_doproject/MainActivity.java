@@ -1,12 +1,17 @@
 package com.example.to_doproject;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
 
 import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
@@ -15,6 +20,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "*****MainActivity*****";
 
+    private EditText     searchEt;
     private RecyclerView recyclerView;
     private View         addNewTaskFab;
     private View         clearTasksBtn;
@@ -34,6 +40,7 @@ public class MainActivity extends AppCompatActivity
         //        SQLiteStudioService.instance().addIpToWhiteList("192.168.1.110");     // my IP
         //        SQLiteStudioService.instance().setPassword("super_secret!!!");
 
+        searchEt      = findViewById(R.id.et_main_search);
         clearTasksBtn = findViewById(R.id.iv_main_clearTask);
         addNewTaskFab = findViewById(R.id.fab_main_newTask);
         recyclerView  = findViewById(R.id.rv_main_task);
@@ -58,6 +65,24 @@ public class MainActivity extends AppCompatActivity
                 sqLiteHelper.clearAllTasks();
                 adapter.clearItems();
             }
+        });
+
+        searchEt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.i(TAG, "onTextChanged: searching");
+                if (s.length() > 0) {
+                    List<Task> tasks = sqLiteHelper.searchInTasks(s.toString().trim());
+                    adapter.setTasks(tasks);
+                }
+                else { adapter.setTasks(sqLiteHelper.getTasks()); }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
         });
     }
 
@@ -94,6 +119,11 @@ public class MainActivity extends AppCompatActivity
         bundle.putParcelable("task", task);
         editTaskDialog.setArguments(bundle);
         editTaskDialog.show(getSupportFragmentManager(), null);
+    }
+
+    @Override
+    public void onCheckItemChanged(Task task) {
+        sqLiteHelper.updateTask(task);
     }
 
     @Override
