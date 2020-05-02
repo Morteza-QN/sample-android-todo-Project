@@ -12,7 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
-    private List<Task> tasks = new ArrayList<>();
+    private List<Task>            tasks = new ArrayList<>();
+    private TaskItemEventListener eventListener;
+
+    public TaskAdapter(TaskItemEventListener eventListener) {
+        this.eventListener = eventListener;
+    }
 
     @NonNull
     @Override
@@ -40,6 +45,21 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         notifyDataSetChanged();
     }
 
+    public void deleteItem(Task task) {
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tasks.get(i).getId() == task.getId()) {
+                tasks.remove(i);
+                notifyItemRemoved(i);
+                break;
+            }
+        }
+    }
+
+    public interface TaskItemEventListener {
+        //every action on item view
+        void onDeleteBtnClick(Task task);
+    }
+
     public class TaskViewHolder extends RecyclerView.ViewHolder {
         private CheckBox checkBox;
         private View     deleteBtn;
@@ -50,9 +70,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             deleteBtn = itemView.findViewById(R.id.imBtn_item_delete);
         }
 
-        public void bindTask(Task task) {
+        public void bindTask(final Task task) {
             checkBox.setChecked(task.isCompleted());
             checkBox.setText(task.getTitle());
+
+            deleteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    eventListener.onDeleteBtnClick(task);
+                }
+            });
         }
     }
+
 }

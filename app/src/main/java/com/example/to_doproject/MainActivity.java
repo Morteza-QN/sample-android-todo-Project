@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
-public class MainActivity extends AppCompatActivity implements TaskDialog.AddNewTaskCallback {
+public class MainActivity extends AppCompatActivity
+        implements TaskDialog.AddNewTaskCallback, TaskAdapter.TaskItemEventListener {
     private static final String TAG = "MainActivity";
     RecyclerView recyclerView;
-    TaskAdapter  adapter = new TaskAdapter();
+    TaskAdapter  adapter = new TaskAdapter(this);
     View         addNewTaskFab;
 
     private SQLiteHelper sqLiteHelper;
@@ -62,5 +63,10 @@ public class MainActivity extends AppCompatActivity implements TaskDialog.AddNew
             adapter.addItem(task);
         }
         else {Log.e(TAG, "onNewTask: item not insert");}
+    }
+
+    @Override
+    public void onDeleteBtnClick(Task task) {
+        if (sqLiteHelper.deleteTask(task) > 0) { adapter.deleteItem(task); }
     }
 }
