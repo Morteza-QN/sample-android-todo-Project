@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity
 
     private RecyclerView recyclerView;
     private View         addNewTaskFab;
+    private View         clearTasksBtn;
     private TaskAdapter  adapter = new TaskAdapter(this);
     private SQLiteHelper sqLiteHelper;
 
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity
         //        SQLiteStudioService.instance().addIpToWhiteList("192.168.1.110");     // my IP
         //        SQLiteStudioService.instance().setPassword("super_secret!!!");
 
+        clearTasksBtn = findViewById(R.id.iv_main_clearTask);
         addNewTaskFab = findViewById(R.id.fab_main_newTask);
         recyclerView  = findViewById(R.id.rv_main_task);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
@@ -46,6 +48,15 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "onClick: btn add new task on activity , show dialog add task");
                 AddTaskDialog dialog = new AddTaskDialog();
                 dialog.show(getSupportFragmentManager(), null);
+            }
+        });
+
+        clearTasksBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "onClick: btn clear tasks on application");
+                sqLiteHelper.clearAllTasks();
+                adapter.clearItems();
             }
         });
     }

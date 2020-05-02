@@ -65,6 +65,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         }
     }
 
+    public void clearItems() {
+        Log.i(TAG, "clearItems: clear all task on recycler list");
+        tasks.clear();
+        notifyDataSetChanged();
+    }
+
     public interface TaskItemEventListener {
         //every action on item view
         void onDeleteItemClick(Task task);

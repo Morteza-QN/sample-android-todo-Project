@@ -3,6 +3,7 @@ package com.example.to_doproject;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -106,5 +107,14 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
 
     // TODO: 5/2/2020 deleteAll
-    public void deleteAllTasks() {}
+    public void clearAllTasks() {
+        SQLiteDatabase database = getWritableDatabase();
+        try {
+            database.execSQL("DELETE FROM " + TABLE_TASK);
+        }
+        catch (SQLException e) {
+            Log.e(TAG, "clearAllTasks: ", e);
+        }
+        database.close();
+    }
 }
