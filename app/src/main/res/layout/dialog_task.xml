@@ -16,6 +16,7 @@
         android:textSize="16sp" />
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/etl_dialog_title"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,13 +24,13 @@
         android:hint="@string/hint_et_dialog">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_dialog_save"
+            android:id="@+id/et_dialog_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btm_dialog_save"
+        android:id="@+id/btn_dialog_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
