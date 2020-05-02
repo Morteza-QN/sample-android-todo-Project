@@ -20,19 +20,19 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "*****MainActivity*****";
 
-    private EditText     searchEt;
-    private RecyclerView recyclerView;
-    private View         addNewTaskFab;
-    private View         clearTasksBtn;
-    private TaskAdapter  adapter = new TaskAdapter(this);
-    private SQLiteHelper sqLiteHelper;
+    private EditText             searchEt;
+    private RecyclerView         recyclerView;
+    private View                 addNewTaskFab;
+    private View                 clearTasksBtn;
+    private TaskAdapter          adapter = new TaskAdapter(this);
+    private TaskDataAccessObject taskDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sqLiteHelper = new SQLiteHelper(this);
+        taskDao = AppDatabase.getAppDatabase(this).getTaskDao();
 
         SQLiteStudioService.instance().start(this);                              // For SQLite studio connect
         //        SQLiteStudioService.instance().setPort(9999);                         // Using custom port number:
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         recyclerView.setAdapter(adapter);
 
-        adapter.addItems(sqLiteHelper.getTasks());
+        adapter.addItems(taskDao.getTasks());
 
         addNewTaskFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "onClick: btn clear tasks on application");
-                sqLiteHelper.clearAllTasks();
+                taskDao.clearAllTasks();
                 adapter.clearItems();
             }
         });
@@ -75,10 +75,10 @@ public class MainActivity extends AppCompatActivity
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.i(TAG, "onTextChanged: searching");
                 if (s.length() > 0) {
-                    List<Task> tasks = sqLiteHelper.searchInTasks(s.toString().trim());
+                    List<Task> tasks = taskDao.searchInTasks(s.toString().trim());
                     adapter.setTasks(tasks);
                 }
-                else { adapter.setTasks(sqLiteHelper.getTasks()); }
+                else { adapter.setTasks(taskDao.getTasks()); }
             }
 
             @Override
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onNewTask(Task task) {
         Log.i(TAG, "onNewTask: added new task on application , implement callback add dialog");
-        long taskId = sqLiteHelper.addTask(task);
+        long taskId = taskDao.addTask(task);
         if (taskId != -1) {
             task.setId(taskId);
             adapter.addItem(task);
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDeleteItemClick(Task task) {
         Log.i(TAG, "onDeleteItemClick: deleted task on application , implement eventListener adapter");
-        if (sqLiteHelper.deleteTask(task) > 0) { adapter.deleteItem(task); }
+        if (taskDao.deleteTask(task) > 0) { adapter.deleteItem(task); }
     }
 
     @Override
@@ -123,12 +123,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onCheckItemChanged(Task task) {
-        sqLiteHelper.updateTask(task);
+        taskDao.updateTask(task);
     }
 
     @Override
     public void onEditTask(Task task) {
         Log.i(TAG, "onEditTask: edited title task on application , implement callback edit dialog");
-        if (sqLiteHelper.updateTask(task) > 0) { adapter.EditItem(task); }
+        if (taskDao.updateTask(task) > 0) { adapter.EditItem(task); }
     }
 }
