@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
-    private static final String TAG           = "SQLiteHelper";
+    private static final String TAG           = "****SQLiteHelper****";
     private static final String TABLE_TASK    = "tbl_task";
     private static final String ID_TASK       = "id";
     private static final String TITLE_TASK    = "title";
@@ -32,10 +32,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             db.execSQL(
                     " CREATE TABLE " + TABLE_TASK + " ( " + ID_TASK + " Integer PRIMARY KEY AUTOINCREMENT, " + TITLE_TASK +
                     " TEXT , " + COMPLETE_TASK + " BOOLEAN); ");
-            Log.i(TAG, "onCreate: table" + TABLE_TASK);
+            Log.i(TAG, "onCreate: table " + TABLE_TASK);
         }
         catch (Exception e) {
-            Log.i(TAG, "onCreate: not crated table \n\n" + e.toString());
+            Log.i(TAG, "onCreate: not create table \n\n" + e.toString());
         }
     }
 
@@ -50,17 +50,17 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         contentValues.put(TITLE_TASK, task.getTitle());
         contentValues.put(COMPLETE_TASK, task.isCompleted());
         long result = database.insert(TABLE_TASK, null, contentValues); // error return -1
+        Log.i(TAG, "addTask: on database id=" + result);
         database.close();
         return result;
     }
 
     public List<Task> getTasks() {
-        Log.i(TAG, "getTasks: select \n\n");
+        Log.i(TAG, "getTasks: select from database");
         SQLiteDatabase database = getReadableDatabase();
         List<Task>     tasks    = new ArrayList<>();
         try {
             Cursor cursor = database.rawQuery(" SELECT * FROM " + TABLE_TASK, null);
-            Log.i(TAG, "getTasks: cursor \n\n" + cursor.toString());
             if (cursor.moveToFirst()) {
                 do {
                     Task task = new Task();
@@ -68,13 +68,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     task.setTitle(cursor.getString(1));
                     task.setCompleted(cursor.getInt(2) == 1);
                     tasks.add(task);
-                    Log.i(TAG, "getTasks: size = " + tasks.size());
                 }
                 while (cursor.moveToNext());
             }
+            Log.i(TAG, "getTasks: task on database = " + tasks.size());
             cursor.close();
             database.close();
-
         }
         catch (Exception e) {
             Log.i(TAG, "getTasks: " + e.toString());
@@ -93,19 +92,19 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         contentValues.put(COMPLETE_TASK, task.isCompleted());
         int result = database.update(TABLE_TASK, contentValues, " id = ? ",
                 new String[]{String.valueOf(task.getId())}); // error return -1
-
+        Log.i(TAG, "updateTask: on database" + result);
         database.close();
         return result;
     }
-
 
     public int deleteTask(Task task) {
         SQLiteDatabase database = getWritableDatabase();
         int            result   = database.delete(TABLE_TASK, "id=?", new String[]{String.valueOf(task.getId())});
-
+        Log.i(TAG, "deleteTask: on database" + result);
         database.close();
         return result;
     }
 
+    // TODO: 5/2/2020 deleteAll
     public void deleteAllTasks() {}
 }

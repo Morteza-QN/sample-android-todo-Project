@@ -4,4 +4,5 @@
     <string name="title_dialog_task">اضافه کردن وظیفه</string>
     <string name="hint_et_dialog">عنوان</string>
     <string name="save">ذخیره</string>
+    <string name="Title_edit_dialog">ویرایش وظیفه</string>
 </resources>

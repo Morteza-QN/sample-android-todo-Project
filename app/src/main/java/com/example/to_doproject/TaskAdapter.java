@@ -1,5 +1,6 @@
 package com.example.to_doproject;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
-    private List<Task>            tasks = new ArrayList<>();
-    private TaskItemEventListener eventListener;
+    private static final String                TAG   = "****TaskAdapter****";
+    private              List<Task>            tasks = new ArrayList<>();
+    private              TaskItemEventListener eventListener;
 
-    public TaskAdapter(TaskItemEventListener eventListener) {
-        this.eventListener = eventListener;
-    }
+    public TaskAdapter(TaskItemEventListener eventListener) { this.eventListener = eventListener; }
 
     @NonNull
     @Override
@@ -26,23 +26,32 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
-        holder.bindTask(tasks.get(position));
-    }
+    public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) { holder.bindTask(tasks.get(position)); }
 
     @Override
-    public int getItemCount() {
-        return tasks.size();
+    public int getItemCount() { return tasks.size(); }
+
+    public void EditItem(Task task) {
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tasks.get(i).getId() == task.getId()) {
+                tasks.set(i, task);
+                notifyItemChanged(i);
+                Log.i(TAG, "EditItem: on recycle list");
+                break;
+            }
+        }
     }
 
     public void addItem(Task task) {
         tasks.add(0, task);
         notifyItemInserted(0);
+        Log.i(TAG, "addItem: on recycle list position 0");
     }
 
     public void addItems(List<Task> tasks) {
         this.tasks.addAll(tasks);
         notifyDataSetChanged();
+        Log.i(TAG, "addItems: refresh list recycler");
     }
 
     public void deleteItem(Task task) {
@@ -50,6 +59,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             if (tasks.get(i).getId() == task.getId()) {
                 tasks.remove(i);
                 notifyItemRemoved(i);
+                Log.i(TAG, "deleteItem: on recycle list by position" + i + " id=" + task.getId());
                 break;
             }
         }
@@ -57,7 +67,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     public interface TaskItemEventListener {
         //every action on item view
-        void onDeleteBtnClick(Task task);
+        void onDeleteItemClick(Task task);
+
+        void onEditItemClick(Task task);
     }
 
     public class TaskViewHolder extends RecyclerView.ViewHolder {
@@ -77,10 +89,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             deleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    eventListener.onDeleteBtnClick(task);
+                    Log.i(TAG, "onClick: eventListener onDeleteItem send task selected for deleted...");
+                    eventListener.onDeleteItemClick(task);
+                }
+            });
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Log.i(TAG, "onLongClick: eventListener onEditItem send task selected for edited...");
+                    eventListener.onEditItemClick(task);
+                    return false;
                 }
             });
         }
     }
-
 }

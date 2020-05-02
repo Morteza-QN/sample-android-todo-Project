@@ -11,12 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
 public class MainActivity extends AppCompatActivity
-        implements TaskDialog.AddNewTaskCallback, TaskAdapter.TaskItemEventListener {
-    private static final String TAG = "MainActivity";
-    RecyclerView recyclerView;
-    TaskAdapter  adapter = new TaskAdapter(this);
-    View         addNewTaskFab;
+        implements AddTaskDialog.AddNewTaskCallback, TaskAdapter.TaskItemEventListener, EditTaskDialog.EditTaskCallback {
 
+    private static final String TAG = "*****MainActivity*****";
+
+    private RecyclerView recyclerView;
+    private View         addNewTaskFab;
+    private TaskAdapter  adapter = new TaskAdapter(this);
     private SQLiteHelper sqLiteHelper;
 
     @Override
@@ -37,13 +38,13 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         recyclerView.setAdapter(adapter);
 
-
         adapter.addItems(sqLiteHelper.getTasks());
 
         addNewTaskFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TaskDialog dialog = new TaskDialog();
+                Log.i(TAG, "onClick: btn add new task on activity , show dialog add task");
+                AddTaskDialog dialog = new AddTaskDialog();
                 dialog.show(getSupportFragmentManager(), null);
             }
         });
@@ -51,12 +52,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
+        Log.i(TAG, "onDestroy: ");
         SQLiteStudioService.instance().stop();
         super.onDestroy();
     }
 
     @Override
     public void onNewTask(Task task) {
+        Log.i(TAG, "onNewTask: added new task on application , implement callback add dialog");
         long taskId = sqLiteHelper.addTask(task);
         if (taskId != -1) {
             task.setId(taskId);
@@ -66,7 +69,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDeleteBtnClick(Task task) {
+    public void onDeleteItemClick(Task task) {
+        Log.i(TAG, "onDeleteItemClick: deleted task on application , implement eventListener adapter");
         if (sqLiteHelper.deleteTask(task) > 0) { adapter.deleteItem(task); }
+    }
+
+    @Override
+    public void onEditItemClick(Task task) {
+        //main get task from adapter        //send task to edit dialog
+        Log.i(TAG, "onEditItemClick: send task to edit dialog , implement eventListener adapter");
+        EditTaskDialog editTaskDialog = new EditTaskDialog();
+        Bundle         bundle         = new Bundle();
+        bundle.putParcelable("task", task);
+        editTaskDialog.setArguments(bundle);
+        editTaskDialog.show(getSupportFragmentManager(), null);
+    }
+
+    @Override
+    public void onEditTask(Task task) {
+        Log.i(TAG, "onEditTask: edited title task on application , implement callback edit dialog");
+        if (sqLiteHelper.updateTask(task) > 0) { adapter.EditItem(task); }
     }
 }
